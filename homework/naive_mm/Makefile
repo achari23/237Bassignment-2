@@ -15,7 +15,7 @@ endif
 all: solution
 
 solution: ../../helper_lib/helper_lib.a main.c
-	$(CC) $(CFLAGS) -o $@ $^ $(INCFLAGS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(INCFLAGS) $(LDFLAGS) -O1 -ftree-vectorize
 
 ../../helper_lib/helper_lib.a: 
 	cd ../../helper_lib; make
@@ -31,6 +31,9 @@ run: solution
 	./solution Dataset/7/input0.raw Dataset/7/input1.raw Dataset/7/output.raw output.raw
 	./solution Dataset/8/input0.raw Dataset/8/input1.raw Dataset/8/output.raw output.raw
 	./solution Dataset/9/input0.raw Dataset/9/input1.raw Dataset/9/output.raw output.raw
+
+test: solution 
+	./solution Dataset/1/input0.raw Dataset/1/input1.raw Dataset/1/output.raw output.raw
 	
 clean: 
 	rm -f solution

@@ -13,6 +13,18 @@
 void NaiveMatrixMultiply(Matrix *input0, Matrix *input1, Matrix *result)
 {
     //@@ Insert code to implement naive matrix multiply here
+    //iterate for amount of values in shape
+    int row0 = input0->shape[0]; 
+    int col0 = input0->shape[1];
+    int col1 = input1->shape[1];
+    for (int i = 0; i < row0; i++) {
+        for (int j = 0; j < col1; j++ ) {
+            for (int k = 0; k < col0; k++ ) {
+                result->data[i*col1+j]+= input0->data[i*col0+k] * input1->data[k*col1+j];
+            }
+        }
+    }
+
 }
 
 int main(int argc, char *argv[])
@@ -43,6 +55,8 @@ int main(int argc, char *argv[])
     CHECK_ERR(err, "LoadMatrix");
 
     int rows, cols;
+    rows = host_a.shape[0];
+    cols = host_b.shape[1];
     //@@ Update these values for the output rows and cols of the output
     //@@ Do not use the results from the answer matrix
 
@@ -55,8 +69,12 @@ int main(int argc, char *argv[])
     NaiveMatrixMultiply(&host_a, &host_b, &host_c);
 
     // // Call to print the matrix
-    // PrintMatrix(&host_c);
-
+    //PrintMatrix(&host_c);
+    //printf("\n");
+    //PrintMatrix(&host_a);
+    //PrintMatrix(&host_b);
+    //PrintMatrix(&answer);
+    // return EXIT_FAILURE;
     // Check the result of the matrix multiply
     CheckMatrix(&answer, &host_c);
 
