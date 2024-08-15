@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <arm_neon.h>
 #include "matrix.h"
 
 #define CHECK_ERR(err, msg)                           \
@@ -27,12 +27,25 @@ void NaiveMatrixMultiply(Matrix *input0, Matrix *input1, Matrix *result)
             blockSize = m;
         }
     } 
+    float32_t running[4];
     for (int i = 0; i < row0; i+= blockSize) {
         for (int j = 0; j < col1; j+=blockSize) {
             for (int blockRow = i; blockRow < blockSize + i; blockRow++) {
                 for (int blockCol = j; blockCol < blockSize + j; blockCol++) {
-                    for (int k = 0; k < col0; k++ ) {
-                        result->data[blockRow*col1+blockCol]+= input0->data[blockRow*col0+k] * input1->data[k*col1+blockCol];
+                    if (col0 %4 == 0) {
+                        for (int k = 0; k < col0; k+= 4 ) {
+                            running[0] = input0->data[blockRow*col0+k] * input1->data[k*col1+blockCol];
+                            running[1] = input0->data[blockRow*col0+(k+1)] * input1->data[(k+1)*col1+blockCol];
+                            running[2] = input0->data[blockRow*col0+(k+2)] * input1->data[(k+2)*col1+blockCol];
+                            running[3] = input0->data[blockRow*col0+(k+3)] * input1->data[(k+3)*col1+blockCol];
+                            float32x4_t reg = vld1q_f32(running);
+                            result->data[blockRow*col1+blockCol]+= vaddvq_f32(reg);
+                        }
+                    }
+                    else {
+                        for (int k = 0; k < col0; k++ ) {
+                            result->data[blockRow*col1+blockCol]+= input0->data[blockRow*col0+k] * input1->data[k*col1+blockCol];
+                        }
                     }
                 }
             }

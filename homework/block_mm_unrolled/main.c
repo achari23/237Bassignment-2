@@ -29,10 +29,17 @@ void NaiveMatrixMultiply(Matrix *input0, Matrix *input1, Matrix *result)
     } 
     for (int i = 0; i < row0; i+= blockSize) {
         for (int j = 0; j < col1; j+=blockSize) {
-            for (int blockRow = 0; blockRow < blockSize + i; blockRow++) {
-                for (int blockCol = 0; blockCol < blockSize + j; blockCol++) {
-                    for (int k = 0; k < col0; k++ ) {
-                        result->data[blockRow*col1+blockCol]+= input0->data[blockRow*col0+k] * input1->data[k*col1+blockCol];
+            for (int blockRow = i; blockRow < blockSize + i; blockRow++) {
+                for (int blockCol = j; blockCol < blockSize + j; blockCol++) {
+                    if (col0 %4 == 0) {
+                        for (int k = 0; k < col0; k+= 4 ) {
+                            result->data[blockRow*col1+blockCol]+= input0->data[blockRow*col0+k] * input1->data[k*col1+blockCol] + input0->data[blockRow*col0+(k+1)] * input1->data[(k+1)*col1+blockCol] + input0->data[blockRow*col0+(k+2)] * input1->data[(k+2)*col1+blockCol] + input0->data[blockRow*col0+(k+3)] * input1->data[(k+3)*col1+blockCol];
+                        }
+                    }
+                    else {
+                        for (int k = 0; k < col0; k++ ) {
+                            result->data[blockRow*col1+blockCol]+= input0->data[blockRow*col0+k] * input1->data[k*col1+blockCol];
+                        }
                     }
                 }
             }
@@ -91,7 +98,7 @@ int main(int argc, char *argv[])
     //PrintMatrix(&answer);
     // return EXIT_FAILURE;
     // Check the result of the matrix multiply
-    //CheckMatrix(&answer, &host_c);
+    CheckMatrix(&answer, &host_c);
 
     // Save the matrix
     SaveMatrix(input_file_d, &host_c);
