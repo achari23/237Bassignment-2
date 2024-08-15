@@ -46,23 +46,30 @@ int main(int argc, char *argv[])
     
     float32_t sum = 0;
     float32_t running[4];
-    for (int i = 0; i < rows * cols; i += 4)
-    {
-        
-        running[0] = host_a.data[i];
-        running[1] = host_a.data[i+1]; 
-        running[2] = host_a.data[i+2];
-        running[3] = host_a.data[i+3];
-        int x = 0;
-        float32x4_t reg = vld1q_f32(running);
-        sum  += vaddvq_f32(reg);
-        
+    if (rows*cols % 4 == 0 ) {
+        for (int i = 0; i < rows * cols; i += 4)
+        {
+            
+            running[0] = host_a.data[i];
+            running[1] = host_a.data[i+1]; 
+            running[2] = host_a.data[i+2];
+            running[3] = host_a.data[i+3];
+            int x = 0;
+            float32x4_t reg = vld1q_f32(running);
+            sum  += vaddvq_f32(reg);
+            
+        }
+    }
+    else {
+        for (int i = 0; i < rows * cols; i += 1) {
+            sum += host_a.data[i];
+        }
     }
 
     printf("sum: %f == %f\n", sum, host_b.data[0]);
 
     output.data[0] = sum;
-    //err = CheckMatrix(&host_b, &output);
+    err = CheckMatrix(&host_b, &output);
     CHECK_ERR(err, "CheckMatrix");
     SaveMatrix(output_file, &output);
 

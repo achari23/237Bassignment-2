@@ -44,10 +44,17 @@ int main(int argc, char *argv[])
     // Sum all elements of the array
     //@@ Modify the below code in the remaining demos
     float sum = 0;
+    if (rows*cols % 4 == 0 ) {
+        for (int i = 0; i < rows * cols; i += 4)
+        {
+            sum += host_a.data[i] + host_a.data[i+1] + host_a.data[i+2] + host_a.data[i+3];
+        }
+    }
+    else {
+        for (int i = 0; i < rows * cols; i += 1) {
+            sum += host_a.data[i];
+        }
 
-    for (int i = 0; i < rows * cols; i += 4)
-    {
-        sum += host_a.data[i] + host_a.data[i+1] + host_a.data[i+2] + host_a.data[i+3];
     }
 
     printf("sum: %f == %f\n", sum, host_b.data[0]);
